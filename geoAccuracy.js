@@ -2,54 +2,86 @@ var fs = require('fs');
 var geolib = require('geographiclib').Geodesic.WGS84;
 
 var geoAccuracy = {
-	points: [],
+	mobilityPoints: [],
+	localePoints: [],
 	
-	//read the evaluation file
-	initEval: function (p) {
-		fs.readFile('./data/public-eval', 'utf8',function(err, data) {
+	initLocaleEval: function() {
+		geoAccuracy.initEval('./data/mediaeval2015_placing_locale_leaderboard', geoAccuracy.localePoints);
+	},
+	
+	initMobilityEval: function() {
+		geoAccuracy.initEval('./data/mediaeval2015_placing_mobility_leaderboard', geoAccuracy.mobilityPoints);
+	},
+	
+	//read the public leaderboard items into memory (should only called within geoAccuracy)
+	initEval: function (file, points) {
+		console.log('Initializing the evaluation of '+file);
+		if(file == undefined) {
+			return;
+		}
+		fs.readFile(file, 'utf8',function(err, data) {
 			if(err) {
-				console.log('Error during the initialization of the evaluation module: '+err);
+				console.log('Initialization error: '+err);
 				return;
 			}
 			var lines = data.split("\n");
 			lines.forEach(function(line) {
 				var tokens = line.split(/\s+/);
-				var p = new Point(tokens[0], tokens[1], tokens[2]);
-				geoAccuracy.points[tokens[0]]=p;
+				points[tokens[0]]=new Point(tokens[0], tokens[1], tokens[2]);
 			});
-			console.log("Number of loaded items for evaluation: "+geoAccuracy.getNumItems());
+			console.log("Number of evaluation items: "+Object.keys(points).length);
 		});
 	},
 	
-	getNumItems : function() {
-		return Object.keys(geoAccuracy.points).length;
+	getNumItems : function(evalType) {
+		var points = null;
+		if(evalType == 'locale') {
+			points = geoAccuracy.localePoints;
+		}
+		else if(evalType=='mobility') {
+			points = geoAccuracy.mobilityPoints;
+		}
+		else {;}
+		
+		if(points == null ) {
+			return 0;
+		}
+		return Object.keys(points).length;
 	},
 	
 	//compute the error one item at a time
-	computeError : function(token, file) {
+	computeError : function(token, file, evalType) {
+		var points = null;
+		if(evalType == 'locale') {
+			points = geoAccuracy.localePoints;
+		}
+		else if(evalType=='mobility') {
+			points = geoAccuracy.mobilityPoints;
+		}
+		else {;}		
+		
 		console.log("Computing the error");
 		var totalErrorDist = 0;
 		var validItems = 0;
 		
 		fs.readFile(file, 'utf8', function(err,data) {
 			if(err) {
-				console.log('Error when reading submission file');
-				app.ranking.update(name,'NaN',file,'Submitted file appears to be corrupt');
+				console.log('Error when reading submission file: '+err);
 				return;
 			}
 			var lines = data.split(/\n/);
 			lines.forEach(function(line) {
-				var tokens = line.split(/\s+/);
+				var tokens = line.split(/;/);//separated by semi-colon, hash;longitude;latitude
 				var id = tokens[0];
-				var latitude = Number(tokens[1]);
-				var longitude = Number(tokens[2]);
+				var longitude = Number(tokens[1]);
+				var latitude = Number(tokens[2]);
 				
 				//our ground truth
-				if(geoAccuracy.points[id]!=undefined) {
-					var gtLatitude = geoAccuracy.points[id].latitude;
-					var gtLongitude = geoAccuracy.points[id].longitude;
+				if(id in points) {
+					var gtLatitude = points[id].latitude;
+					var gtLongitude = points[id].longitude;
 					
-					if(Math.abs(latitude)<=90 && Math.abs(longitude)<=180 && geoAccuracy.points[id]!=undefined) {
+					if(Math.abs(latitude)<=90 && Math.abs(longitude)<=180) {
 						var e = geolib.Inverse(latitude, longitude, gtLatitude, gtLongitude);
 						totalErrorDist += e.s12;
 						validItems++;
@@ -57,24 +89,22 @@ var geoAccuracy = {
 				}
 			});
 			
-			if(validItems < geoAccuracy.getNumItems()/2) {
+			if(validItems < geoAccuracy.getNumItems(evalType)/2) {
 				console.log('Less than half of all items present in submission');
-				app.ranking.updateItem(token,'NaN',file, 'Submitted file contains less than half of the evaluated items');
+				app.ranking.updateItem(token,evalType,'NaN',file);
 				return;
 			}
 			var averageError = totalErrorDist / validItems;
-			console.log("Average error (m): "+averageError+ " ["+token+" for submission "+file+"]");
-			console.log("Average error (km): "+averageError/1000);
-			app.ranking.updateItem(token,averageError, file, (validItems < geoAccuracy.getNumItems()) ? 'Not all evaluated items were found' : '');
+			app.ranking.updateItem(token,evalType, averageError, file);
 			return;
 		});
 	}
 };
 
-function Point(id, latitude, longitude) {
+function Point(id, longitude, latitude) {
 	this.id = id;
-	this.latitude = latitude;
 	this.longitude = longitude;
+	this.latitude = latitude;
 }
 
 exports.geoAccuracy = geoAccuracy;

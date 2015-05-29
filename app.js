@@ -30,7 +30,8 @@ app.ranking.loadFromBackup();
 setInterval(app.ranking.backup, Number(app.config["milliseconds-between-backups"]));
 
 var geoAccuracy = require('./geoAccuracy.js').geoAccuracy;
-geoAccuracy.initEval();
+geoAccuracy.initLocaleEval();
+geoAccuracy.initMobilityEval();
 app.geoAccuracy = geoAccuracy;
 
 

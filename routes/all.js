@@ -4,10 +4,12 @@ var Multer = require('multer');
 var nodemailer = require('nodemailer');
 var randtoken = require('rand-token');
 
+
 /* GET current leaderboard */
 router.get('/', function(req, res, next) {
-  console.log("Rendering the leaderboard with "+app.ranking.items.length+" items");
-  res.render('leaderboard', { ranking:app.ranking.items });
+  res.render('leaderboard', { mobilityRanking: app.ranking.mobilityItems.sort(app.ranking.ascSort), 
+                              localeRanking:app.ranking.localeItems.sort(app.ranking.ascSort)
+  });
 });
 
 
@@ -108,13 +110,17 @@ router.post('/runSubmission', Multer(
     onFileUploadComplete: function (file, req, res) {
       
       var token = req.body.token;
+      var evalType = req.body.evalType;
+      console.log("eval type: "+evalType);
 
       //once the upload is complete, check whether the run is valid
       //and if so, compute the prediction accuracy
       var currentTime = new Date().getTime();
-      var lastSubmission = app.ranking.getLastSubmissionDate(token);
+      var lastSubmission = app.ranking.getLastSubmissionDate(token, evalType);
       var waitMilliseconds = Number(app.config["milliseconds-between-uploads"]);
       var waitMinutes = waitMilliseconds/(1000 * 60);
+      
+      console.log("last submission: "+lastSubmission+", waitMinutes: "+waitMinutes);
       
       if(lastSubmission != null) {
         lastSubmission = new Date(lastSubmission).getTime();
@@ -124,11 +130,11 @@ router.post('/runSubmission', Multer(
       }
       else if( lastSubmission != null && Math.abs(currentTime - lastSubmission) < waitMilliseconds) {
         console.log("Number of seconds waited between uploads: "+ Math.abs(currentTime-lastSubmission)/1000);
-        var errorMsg = "Run upload fialed: you have to wait at least "+waitMinutes+" between subsequent submissions.";
+        var errorMsg = "Run upload failed: you have to wait at least "+waitMinutes+" minutes between subsequent submissions.";
         res.render('error', { message: errorMsg });         
       }
       else {
-        app.geoAccuracy.computeError(req.body.token, file.path);
+        app.geoAccuracy.computeError(req.body.token, file.path, evalType);
         res.render('success', { message:'It may take a few minutes for your new score to be computed.' });
       }
     }

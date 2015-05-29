@@ -7,17 +7,23 @@ block content
     p.
       The <a href="http://www.multimediaeval.org/mediaeval2015/placing2015/">Placing Task</a> at 
       the <a href="http://www.multimediaeval.org/mediaeval2015/">MediaEval 2015 benchmark</a> 
-      initiative equires participants to estimate the locations where multimedia items 
+      initiative requires participants to estimate the locations where multimedia items 
       (photos or videos) were captured.
-      We provide a live leaderboard to encourage participants to work on their approaches
-      throughout the coming months.
+      We provide live leaderboards of both sub-tasks (mobility and locale) to encourage 
+      participants to work on their approaches throughout the coming months.
     p.
-      The leaderboard is based on 30% of the test data; only the final results will be computed
+      The leaderboards are based on 30% of the test data; only the final results will be computed
       across all released test data. Shown are for each team the Average Error of the latest submission (in meters),
       the total number of runs submitted and the Average Error of the team's best submission.
-      
+    p.
+      For simplicity, both tasks are currently evaluated according to the 
+      <a href="http://geographiclib.sourceforge.net/geod.html">Karney distance</a> between 
+      predicted and actual location. The Karney distance is the main metric of the
+      mobility sub-task. The main metric for the Locale sub-task will be based
+      on the hierarchical distance (to be added later).
+       
   header(class='post-header')
-    h2(class='post-title') Leaderboard
+    h2(class='post-title') Mobility Leaderboard
   div(class='post-description')
       table(class='pure-table pure-table-horizontal pure-table-striped')
         thead
@@ -27,7 +33,25 @@ block content
             th #Runs
             th Lowest Error (in m)
           tbody
-            each r in ranking
+            each r in mobilityRanking
+              tr
+                td #{r.name}
+                td #{r.avError}
+                td #{r.updates}
+                td #{r.minError}
+
+  header(class='post-header')
+    h2(class='post-title') Locale Leaderboard
+  div(class='post-description')
+      table(class='pure-table pure-table-horizontal pure-table-striped')
+        thead
+          tr
+            th Team 
+            th Latest Error (in m)
+            th #Runs
+            th Lowest Error (in m)
+          tbody
+            each r in localeRanking
               tr
                 td #{r.name}
                 td #{r.avError}

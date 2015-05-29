@@ -5,13 +5,28 @@ block content
     h2(class='post-title') Run submission
   div(class='post-description')
     p.
-      Teams can submit up to one run per hour. 
+      Teams can submit up to one run per hour for each sub-task.
       
     p.
       Since we do not make public which part of the test data
-      is used for this leaderboard, we expect your runs to contain results for all test cases.
-      During the computation of the public leaderboard missing test cases are ignored (they are taken 
-      into account during the final ranking of runs).
+      is used for this leaderboard, we expect your runs to contain results 
+      for all test cases.
+      During the computation of the public leaderboard missing 
+      test cases are ignored 
+      (they are taken into account during the final ranking of runs). 
+      If your submission contains less than half of the public test cases, it will
+      not be evaluated.
+      
+    p.
+      Don't forget to choose the correct sub-task for your submission.
+    
+    p.
+      Expected file format (per line): <b>hash;longitude;latitude</b>
+      
+    p.
+      If the table records an 'NaN' for your run, double-check the
+      sub-task you selected (does it match the submission?) and the
+      format of your submission.
 
     form(action="runSubmission", name="runSubmission", method="post", enctype="multipart/form-data", class='pure-form pure-form-stacked')
       fieldset
@@ -22,5 +37,11 @@ block content
           label(for='token') Run file
           input(type="file", id="runFile", name="runFile")
         div(class='pure-content-group')
-          input(type='submit', value='Upload \& Evaluate', class="pure-button pure-button-primary")
+          label(for='evalType') Sub task
+          select(id='evalType', name='evalType')
+            option(value='locale') Locale
+            option(value='mobility') Mobility
+        div(class='pure-content-group')
+          label(for='submit') Warning: upload can be slow, be patient!
+          input(type='submit', id='submit', name='submit', value='Upload \& Evaluate', class="pure-button pure-button-primary")
     
