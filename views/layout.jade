@@ -1,0 +1,33 @@
+doctype html
+html
+  head
+    title MediaEval Placing Task 2015 Leaderboard
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/blog.css')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+  body
+    div(class='pure-g')
+      div(class='sidebar pure-u-1 pure-u-md-1-4')
+        div(class='header')
+          h1(class='brand-title') Placing '15
+          h2(class='brand-tagline') Live Leaderboard
+          
+          nav(class='nav')
+            ul(class='nav-list')
+              li(class='nav-item')
+                a(href='./register', class="pure-button ") Register
+              li(class='nav-item')
+                a(href='./submit', class="pure-button") Submit a run
+              li(class='nav-item')
+                a(href='./', class="pure-button") View leaderboard
+            p.
+               placing2015@gmail.com
+            p.
+               Organized by:<br>Bart Thomee<br>Olivier Van Laere<br>Claudia Hauff<br>Jaeyoung Choi
+
+      div(class='content pure-u-1 pure-u-md-3-4')
+        div
+          div(class='posts')
+            section(class='post')
+              block content
+          

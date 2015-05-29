@@ -1,0 +1,33 @@
+extends layout.jade
+
+block content
+  header(class='post-header')
+    h2(class='post-title') The Placing Task
+  div(class='post-description')
+    p.
+      The Placing Task at the MediaEval 2015 benchmark initiative equires participants 
+      to estimate the locations where multimedia items (photos or videos) were captured.
+      We provide a live leaderboard to encourage participants to work on their approaches
+      throughout the coming months.
+    p.
+      The leaderboard is based on 30% of the test data; only the final results will be computed
+      across all released test data. Shown are for each team the Average Error of the latest submission (in meters),
+      the total number of runs submitted and the Average Error of the team's best submission.
+      
+  header(class='post-header')
+    h2(class='post-title') Leaderboard
+  div(class='post-description')
+      table(class='pure-table pure-table-horizontal pure-table-striped')
+        thead
+          tr
+            th Team 
+            th Latest Error (in m)
+            th #Runs
+            th Lowest Error (in m)
+          tbody
+            each r in ranking
+              tr
+                td #{r.name}
+                td #{r.avError}
+                td #{r.updates}
+                td #{r.minError}

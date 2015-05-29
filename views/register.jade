@@ -1,0 +1,24 @@
+extends layout.jade
+
+block content
+  header(class='post-header')
+    h2(class='post-title') Registration
+  div(class='post-description')
+    p.
+      To register, simply think of a team name and provide
+      us with your email address. We will send you a token
+      that you will use in all your run submissions to the leaderboard.
+    p. 
+      Multiple registrations by the same team are not allowed.
+
+    form(action='receiveToken', name='registerTeam', method='get', class='pure-form pure-form-stacked')
+      fieldset
+        div(class='pure-control-group')
+          label(for="teamName") Team name
+          input(type="text", id="teamName", name="teamName", required, pattern="^[A-Za-z0-9_]{3,15}$", placeholder="3-15 alphanumeric chars (no whitespaces)" size="40")
+        div(class='pure-control-group')
+          label(for="email") Email
+          input(type="email", id="email", name="email", required, size="40")
+        div(class='pure-control-group')
+          input(type="submit", value="Register", class='pure-button pure-button-primary')
+          
