@@ -6,6 +6,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var multer = require('multer');
+var fs = require('fs');
+var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+
 app = express();
 
 // view engine setup
@@ -18,15 +21,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 var routes = require('./routes/all');
 app.use('/', routes);
 
+app.config = config;
+
 //create a default ranking for development purposes
 var ranking = require('./ranking.js').ranking;
 app.ranking = ranking;
 app.ranking.loadFromBackup();
-setInterval(app.ranking.backup, 6000);//once a minute, the ranking is saved to file
+setInterval(app.ranking.backup, Number(app.config["milliseconds-between-backups"]));
 
 var geoAccuracy = require('./geoAccuracy.js').geoAccuracy;
 geoAccuracy.initEval();
 app.geoAccuracy = geoAccuracy;
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

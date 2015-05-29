@@ -4,9 +4,6 @@ var Multer = require('multer');
 var nodemailer = require('nodemailer');
 var randtoken = require('rand-token');
 
-var fs = require('fs');
-var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
-
 /* GET current leaderboard */
 router.get('/', function(req, res, next) {
   console.log("Rendering the leaderboard with "+app.ranking.items.length+" items");
@@ -49,30 +46,22 @@ router.get('/receiveToken', function(req, res, next) {
       do {
         randomToken = randtoken.generate(10);
       } while( app.ranking.tokenExists(randomToken));
-      
-      var emailMessage = 
-"Dear Placing Task participant,\n\n \
-please use the token \""+randomToken+"\" (without quotes) when submitting runs to the public leaderboard.\n \
-Your entry will appear under the name \""+teamName+"\".\n \
-If you have questions or need some help for the task, please contact us at placing2015@gmail.com.\n\n \
-Best of luck!\n\n \
--- the Placing Task organizers\n \
-Bart Thomee\n \
-Olivier Van Laere\n \
-Claudia Hauff\n \
-Jaeyoung Choi\n";
-      
+
+      //build the message
+      var emailMessage = app.config["registration-mail-text"].join(" ");
+      emailMessage = emailMessage.replace(/RANDOM_TOKEN/,randomToken).replace(/TEAM_NAME/, String(teamName));
+
       var transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: app.config["email-service"],
       auth: {
-          user: config["email-account"],
-          pass: config["email-password"],
+          user: app.config["email-account"],
+          pass: app.config["email-password"],
             }
       });
       transporter.sendMail({
-          from: config["email-account"],
+          from: app.config["email-account"],
           to: email,
-          subject: 'MediaEval Placing Task 2015: registration token',
+          subject: app.config["registration-mail-subject"],
           text: emailMessage
         }, 
         function(error, info){
@@ -109,7 +98,6 @@ router.post('/runSubmission', Multer(
     dest: './uploads/',
     
     rename: function (fieldname, filename) {
-      console.log('renamed file!');
       return filename+Date.now();
     },
   
@@ -120,11 +108,13 @@ router.post('/runSubmission', Multer(
     onFileUploadComplete: function (file, req, res) {
       
       var token = req.body.token;
-      //once the upload is complete, compute the accuracy of the submission
-      console.log("Checking the error of submission "+req.body.token+", stored in "+file.path);
-      
+
+      //once the upload is complete, check whether the run is valid
+      //and if so, compute the prediction accuracy
       var currentTime = new Date().getTime();
       var lastSubmission = app.ranking.getLastSubmissionDate(token);
+      var waitMilliseconds = Number(app.config["milliseconds-between-uploads"]);
+      var waitMinutes = waitMilliseconds/(1000 * 60);
       
       if(lastSubmission != null) {
         lastSubmission = new Date(lastSubmission).getTime();
@@ -132,9 +122,10 @@ router.post('/runSubmission', Multer(
       if(app.ranking.tokenExists(token)==false) {
         res.render('error', { message:'Run upload failed: your token is not valid.' });
       }
-      else if( lastSubmission != null && Math.abs(currentTime - lastSubmission)/1000 < 60) {
+      else if( lastSubmission != null && Math.abs(currentTime - lastSubmission) < waitMilliseconds) {
         console.log("Number of seconds waited between uploads: "+ Math.abs(currentTime-lastSubmission)/1000);
-        res.render('error', { message:'Run upload failed: you have to wait at least one minute between subsequent submissions.' });         
+        var errorMsg = "Run upload fialed: you have to wait at least "+waitMinutes+" between subsequent submissions.";
+        res.render('error', { message: errorMsg });         
       }
       else {
         app.geoAccuracy.computeError(req.body.token, file.path);
