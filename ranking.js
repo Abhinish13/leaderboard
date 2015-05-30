@@ -119,6 +119,7 @@ var ranking = {
 
 		this.mobilityItems.push(new Item(token, name, email));
 		this.localeItems.push(new Item(token, name, email));
+		this.backup();
 		return true;
 	},
 	
@@ -143,6 +144,7 @@ var ranking = {
 
 		item.lastSubmission = Date();
 		console.log("Submission date set to :"+item.lastSubmission);
+		this.backup();
 		return true;
 	},
 
