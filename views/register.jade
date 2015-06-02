@@ -5,24 +5,27 @@ block content
     h2(class='post-title') Registration
   div(class='post-description')
     p.
-      To register, simply think of a team name and provide
+      To register, simply think of a team/run name combination and provide
       us with your email address. We will send you a token
       that you will use in all your run submissions to the leaderboard.
     p.
       It does not matter in which sub-task you are interested in,
-      the same token will be used to submit your results for both sub-tasks.
+      the same token will be used to submit your run results for both sub-tasks.
     p. 
-      Multiple registrations by the same team are not allowed.
+      Each team can request up to <span class="important">five tokens</span> 
+      (through the same email adres), to distinguish different runs. 
+      For example, a team wishing to work on three different approaches 
+      might register the following team/run names: <i>Delft_1</i>, <i>Delft_2</i> and <i>Delft_3</i>.
       
 
     form(action='receiveToken', name='registerTeam', method='get', class='pure-form pure-form-stacked')
       fieldset
         div(class='pure-control-group')
-          label(for="teamName") Team name
-          input(type="text", id="teamName", name="teamName", required, pattern="^[A-Za-z0-9_]{3,15}$", placeholder="3-15 alphanumeric chars (no whitespaces)" size="40")
+          label(for="teamName") Team/run name
+          input(type="text", id="teamName", name="teamName", required, pattern="^[A-Za-z0-9_]{3,15}$", placeholder="3-15 alphanumeric chars (no whitespaces) or _" size="45")
         div(class='pure-control-group')
           label(for="email") Email
-          input(type="email", id="email", name="email", required, size="40")
+          input(type="email", id="email", name="email", required, size="45")
         div(class='pure-control-group')
           input(type="submit", value="Register", class='pure-button pure-button-primary')
           

@@ -12,9 +12,10 @@ block content
       We provide live leaderboards of both sub-tasks (mobility and locale) to encourage 
       participants to work on their approaches throughout the coming months.
     p.
-      The leaderboards are based on 30% of the test data; only the final results will be computed
-      across all released test data. Shown are for each team the Average Error of the latest submission (in meters),
-      the total number of runs submitted and the Average Error of the team's best submission.
+      The leaderboards are based on <b>30%</b> of the test data; only the final results will be computed
+      across all released test data. Shown are for each team the <span class="important">Median Error</span> 
+      of the latest submission (<span class="important">in kilometers</span>), the total number of runs 
+      submitted and the Median Error of the team's best submission.
     p.
       For simplicity, both tasks are currently evaluated according to the 
       <a href="http://geographiclib.sourceforge.net/geod.html">Karney distance</a> between 
@@ -29,16 +30,19 @@ block content
         thead
           tr
             th Team 
-            th Latest Error (in m)
+            th(class='error') Latest Error (in km)
             th #Runs
-            th Lowest Error (in m)
+            th Lowest Error (in km)
           tbody
             each r in mobilityRanking
-              tr
-                td #{r.name}
-                td #{r.avError}
-                td #{r.updates}
-                td #{r.minError}
+              if r.valid<0
+                tr(class='invalid')
+              else
+                tr
+                  td(class='firstCol') #{r.name}
+                  td #{Number(r.medianError/1000).toFixed(2)}
+                  td #{r.updates}
+                  td #{Number(r.medianError/1000).toFixed(2)}
 
   header(class='post-header')
     h2(class='post-title') Locale Leaderboard
@@ -47,13 +51,16 @@ block content
         thead
           tr
             th Team 
-            th Latest Error (in m)
+            th Latest Error (in km)
             th #Runs
-            th Lowest Error (in m)
+            th Lowest Error (in km)
           tbody
             each r in localeRanking
-              tr
-                td #{r.name}
-                td #{r.avError}
-                td #{r.updates}
-                td #{r.minError}
+              if r.valid<0
+                tr(class='invalid')
+              else
+                tr
+                  td(class='firstCol') #{r.name}
+                  td #{Number(r.medianError/1000).toFixed(2)}
+                  td #{r.updates}
+                  td #{Number(r.medianError/1000).toFixed(2)}

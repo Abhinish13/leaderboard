@@ -5,15 +5,17 @@ var assert = require("assert");
 describe('tests', function(){
     
     describe('geo', function(){
-  
-		before(function(done) {
-			g.initEval();
-			setTimeout(done(),3000);
-		});
 
 	    it('initialize', function(){
-			console.log("starting the timeout ...");
-			assert.equal(4, g.getNumItems());
+			
+			var lat1 = 34.3445;
+			var lng1 = 44.44;
+			var lat2 = 34.35;
+			var lng2 = 44.44;
+			
+			var meters = g.getDistanceInMeters(lat1,lng1,lat2,lng2);
+			console.log("distance: "+meters);
+			assert.ok(meters<1000, "less than 1000m difference");
 		});
     });
 })

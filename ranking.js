@@ -1,18 +1,21 @@
 var fs = require('fs');
 
 var ranking = {
-	//one array per evaluation type
+	
+	//one array per evaluation type (we have two)
 	mobilityItems: [],
 	localeItems: [],
+	
+	//each evaluation type is backed up to a separate file
 	backupFiles: ['./data/backup-ranking-mobility', './data/backup-ranking-locale'],
 	
-	//return the number of items
+	//return the number of items per evaluation type 
 	getNumItems: function (evalType) {
 		var items = null;
-		if (evalType == 'locale') {
+		if (evalType === 'locale') {
 			items = ranking.localeItems;
 		}
-		else if (evalType == 'mobility') {
+		else if (evalType === 'mobility') {
 			items = ranking.mobilityItems;
 		}
 		return items.length;
@@ -22,16 +25,16 @@ var ranking = {
 	//or null, if the item does not exist
 	getItem: function (token, evalType) {
 		var items = null;
-		if (evalType == 'locale') {
+		if (evalType === 'locale') {
 			items = ranking.localeItems;
 		}
-		else if (evalType == 'mobility') {
+		else if (evalType === 'mobility') {
 			items = ranking.mobilityItems;
 		}
 		else { ; }
 
 		for (var i in items) {
-			if (items[i].token == token) {
+			if (items[i].token === token) {
 				return items[i];
 			}
 		}
@@ -40,17 +43,17 @@ var ranking = {
 
 	getLastSubmissionDate: function (token, evalType) {
 		var item = this.getItem(token, evalType);
-		if (item != null) {
+		if (item !== null) {
 			return item.lastSubmission;
 		}
 		return null;
 	},
 	
 	//returns the average error of a particular item
-	getAvError: function (token, evalType) {
+	getMedianError: function (token, evalType) {
 		var item = this.getItem(token, evalType);
-		if (item != null) {
-			return item.avError;
+		if (item !== null) {
+			return item.medianError;
 		}
 		return null;
 	},
@@ -58,7 +61,7 @@ var ranking = {
 	//number of updates (number of submissions) a team made
 	getNumUpdates: function (token, evalType) {
 		var item = this.getItem(token, evalType);
-		if (item != null) {
+		if (item !== null) {
 			return item.updates;
 		}
 		return null;
@@ -66,16 +69,16 @@ var ranking = {
 
 	teamNameExists: function (name, evalType) {
 		var items = null;
-		if (evalType == 'locale') {
+		if (evalType === 'locale') {
 			items = ranking.localeItems;
 		}
-		else if (evalType == 'mobility') {
+		else if (evalType === 'mobility') {
 			items = ranking.mobilityItems;
 		}
 		else { ; }
 
 		for (var i in items) {
-			if (items[i].name.toLowerCase() == name.toLowerCase()) {
+			if (items[i].name.toLowerCase() === name.toLowerCase()) {
 				return true;
 			}
 		}
@@ -84,16 +87,16 @@ var ranking = {
 
 	emailExists: function (email, evalType) {
 		var items = null;
-		if (evalType == 'locale') {
+		if (evalType === 'locale') {
 			items = ranking.localeItems;
 		}
-		else if (evalType == 'mobility') {
+		else if (evalType === 'mobility') {
 			items = ranking.mobilityItems;
 		}
 		else { ; }
 
 		for (var i in items) {
-			if (items[i].email.toLowerCase() == email.toLowerCase()) {
+			if (items[i].email.toLowerCase() === email.toLowerCase()) {
 				return true;
 			}
 		}
@@ -104,7 +107,7 @@ var ranking = {
 	//returns true if it exists, false otherwise
 	tokenExists: function (token) {
 		var item = this.getItem(token, 'locale');//every token is registered to both eval types
-		if (item == null) {
+		if (item === null) {
 			return false;
 		}
 		return true;
@@ -116,46 +119,42 @@ var ranking = {
 		if (this.tokenExists(token)) {
 			return false;
 		}
-
+		//add the item to both evaluation types
 		this.mobilityItems.push(new Item(token, name, email));
 		this.localeItems.push(new Item(token, name, email));
-		this.backup();
+		this.backup();//backup to file
 		return true;
 	},
 	
 	//update the score of an existing item
 	//returns true if an update occurred, false otherwise
-	updateItem: function (token, evalType, avError, submissionFile) {
+	updateItem: function (token, evalType, medianError, submissionFile) {
 		var item = this.getItem(token, evalType);
-		if (item == null) {
+		if (item === null) {
 			return false;
 		}
-		item.avError = avError;
-		if (avError != 'NaN') {
-			item.avError = Number(avError).toFixed(2);
-		}
+		item.medianError = medianError;
 		item.file = submissionFile;
 		item.updates++;
 
-		if (item.minError == '' || item.minError > item.avError) {
-			item.minError = item.avError;
+		if (item.minError === '' || item.minError > item.medianError) {
+			item.minError = item.medianError;
 			item.minErrorFile = item.file;
 		}
 
 		item.lastSubmission = Date();
-		console.log("Submission date set to :"+item.lastSubmission);
-		this.backup();
+		this.backup();//backup after an update
 		return true;
 	},
 
 	backup: function () {
+		console.log('Backing up the ranking ...');
 		ranking._backup(this.mobilityItems, ranking.backupFiles[0]);
 		ranking._backup(this.localeItems, ranking.backupFiles[1]);
 	},
 	
-	//the content of items[] is regularly saved to file
+
 	_backup: function (items, file) {
-		console.log('Writing the ranking to ' + file);
 		var stream = fs.createWriteStream(file);
 		stream.once('open', function (fd) {
 			for (var i in items) {
@@ -166,16 +165,15 @@ var ranking = {
 	},
 
 	loadFromBackup: function () {
+		console.log('Loading ranking from backup ....');
 		ranking._loadFromBackup(this.mobilityItems, ranking.backupFiles[0]);
 		ranking._loadFromBackup(this.localeItems, ranking.backupFiles[1]);
 	},
 
 	_loadFromBackup: function (items, file) {
-		console.log('Loading the existing ranking from ' + file);
-
 		fs.readFile(file, 'utf8', function (err, data) {
 			if (err) {
-				console.log('Error when reading ' + file);
+				console.log('Error when loading the backuped ranking from ' + file);
 				return;
 			}
 			var lines = data.split(/\n/);
@@ -189,10 +187,10 @@ var ranking = {
 	},
 
 	ascScort: function (a, b) {
-		if (a.minError == 'NaN') {
+		if (a.minError === 'NaN') {
 			return 1;
 		}
-		if (b.minError == 'NaN') {
+		if (b.minError === 'NaN') {
 			return -1;
 		}
 		return parseFloat(a.minError) - parseFloat(b.minError);
@@ -201,19 +199,19 @@ var ranking = {
 
 function Item(token, name, email) {
 
+	this.valid = 1;//if computations take a long time, this is a useful flag to have (valid<0) if computations are ongoing
 	this.token = token;
 	this.email = email;
 	this.name = name;
-	this.avError = 'NaN';
+	this.medianError = 'NaN';//median error in meters
+	
 	this.file = '';//path to file from which the current evaluation stems
 	this.updates = 0;
 	this.lastSubmission = '';
-	this.remark = '';//for additional comments if need be
-	//keep track of the best overall submission
+	
+	//minimum median error across all submissions
 	this.minError = 'NaN';
 	this.minErrorFile = '';
 }
-
-
 
 exports.ranking = ranking;

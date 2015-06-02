@@ -1,3 +1,4 @@
+/* global app */
 var fs = require('fs');
 var geolib = require('geographiclib').Geodesic.WGS84;
 
@@ -16,9 +17,11 @@ var geoAccuracy = {
 	//read the public leaderboard items into memory (should only called within geoAccuracy)
 	initEval: function (file, points) {
 		console.log('Initializing the evaluation of '+file);
-		if(file == undefined) {
+		if(file === undefined) {
 			return;
 		}
+		var latErrors = 0;
+		var lngErrors = 0;
 		fs.readFile(file, 'utf8',function(err, data) {
 			if(err) {
 				console.log('Initialization error: '+err);
@@ -27,35 +30,55 @@ var geoAccuracy = {
 			var lines = data.split("\n");
 			lines.forEach(function(line) {
 				var tokens = line.split(/\s+/);
-				points[tokens[0]]=new Point(tokens[0], tokens[1], tokens[2]);
+				
+				//format: hash longitude latitude
+				var longitude = tokens[1];
+				var latitude = tokens[2];
+				points[tokens[0]] = new Point(tokens[0], latitude, longitude);
+				
+				if (Math.abs(latitude) > 91) {
+					latErrors++;
+				}
+				if (Math.abs(longitude) > 180) {
+					lngErrors++;
+				}
 			});
 			console.log("Number of evaluation items: "+Object.keys(points).length);
+			console.log("Number of times latitude/longitude was out of bounds: " + latErrors+"/"+lngErrors);
 		});
 	},
 	
 	getNumItems : function(evalType) {
 		var points = null;
-		if(evalType == 'locale') {
+		if(evalType === 'locale') {
 			points = geoAccuracy.localePoints;
 		}
-		else if(evalType=='mobility') {
+		else if(evalType==='mobility') {
 			points = geoAccuracy.mobilityPoints;
 		}
 		else {;}
 		
-		if(points == null ) {
+		if(points === null ) {
 			return 0;
 		}
 		return Object.keys(points).length;
 	},
 	
+	getDistanceInMeters : function(lat1, lng1, lat2, lng2) {
+		return geolib.Inverse(lat1, lng1, lat2, lng2).s12;
+	},
+	
 	//compute the error one item at a time
-	computeError : function(token, file, evalType) {
+	computeError: function (token, file, evalType) {
+		
+		console.log("starting on computeError ....");
+		app.ranking.getItem(token, evalType).valid = -1;
+		
 		var points = null;
-		if(evalType == 'locale') {
+		if(evalType === 'locale') {
 			points = geoAccuracy.localePoints;
 		}
-		else if(evalType=='mobility') {
+		else if(evalType === 'mobility') {
 			points = geoAccuracy.mobilityPoints;
 		}
 		else {;}		
@@ -63,7 +86,11 @@ var geoAccuracy = {
 		console.log("Computing the error");
 		var totalErrorDist = 0;
 		var validItems = 0;
+		var latErrors = 0;
+		var lngErrors = 0;
 		
+		var errorArray = [];
+
 		fs.readFile(file, 'utf8', function(err,data) {
 			if(err) {
 				console.log('Error when reading submission file: '+err);
@@ -71,10 +98,10 @@ var geoAccuracy = {
 			}
 			var lines = data.split(/\n/);
 			lines.forEach(function(line) {
-				var tokens = line.split(/;/);//separated by semi-colon, hash;longitude;latitude
+				var tokens = line.split(/;/);//separated by semi-colon, hash;latitude;longitude
 				var id = tokens[0];
-				var longitude = Number(tokens[1]);
-				var latitude = Number(tokens[2]);
+				var latitude = Number(tokens[1]);
+				var longitude = Number(tokens[2]);
 				
 				//our ground truth
 				if(id in points) {
@@ -82,9 +109,18 @@ var geoAccuracy = {
 					var gtLongitude = points[id].longitude;
 					
 					if(Math.abs(latitude)<=90 && Math.abs(longitude)<=180) {
-						var e = geolib.Inverse(latitude, longitude, gtLatitude, gtLongitude);
-						totalErrorDist += e.s12;
+						var meters = geoAccuracy.getDistanceInMeters(latitude, longitude, gtLatitude, gtLongitude);
+						errorArray.push(meters);
+						totalErrorDist += meters;
 						validItems++;
+					}
+					
+					if (Math.abs(latitude) >= 91) {
+						latErrors++;
+					}
+					
+					if (Math.abs(longitude) >= 181) {
+						lngErrors++;
 					}
 				}
 			});
@@ -95,16 +131,39 @@ var geoAccuracy = {
 				return;
 			}
 			var averageError = totalErrorDist / validItems;
-			app.ranking.updateItem(token,evalType, averageError, file);
+			var medianError = median(errorArray);
+
+			console.log("Number of latitude/longitude errors: " + latErrors+"/"+lngErrors);
+			console.log("Average error: " + averageError);
+			console.log("Median error: " + medianError);
+			
+			app.ranking.updateItem(token,evalType, medianError, file);
 			return;
 		});
+		
+		app.ranking.getItem(token, evalType).valid = 1;
+		console.log("ending on computeError ....");
 	}
 };
 
-function Point(id, longitude, latitude) {
+function Point(id, latitude, longitude) {
 	this.id = id;
 	this.longitude = longitude;
 	this.latitude = latitude;
-}
+};
+
+function median(values) {
+
+    values.sort( function(a,b) {return a - b;} );
+
+    var half = Math.floor(values.length/2);
+
+    if (values.length % 2) {
+        return values[half];
+	}
+    else {
+        return (values[half - 1] + values[half]) / 2.0;
+	}
+};
 
 exports.geoAccuracy = geoAccuracy;

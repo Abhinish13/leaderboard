@@ -151,6 +151,20 @@ h3 {
     background: none;
 }
 
+
+.important {
+    font-weight: bold;
+    color: #df2d4f;
+}
+
+td.firstCol {
+  width: 15em;
+}
+
+tr.invalid {
+    background-color: darksalmon;
+}
+
 @media (min-width: 48em) {
     .content {
         padding: 2em 3em 0;
@@ -168,3 +182,5 @@ h3 {
         bottom: 0;
     }
 }
+
+
