@@ -22,7 +22,13 @@ block content
       predicted and actual location. The Karney distance is the main metric of the
       mobility sub-task. The main metric for the Locale sub-task will be based
       on the hierarchical distance (to be added later).
+    p.
+      The <span class="important">organizer baselines</span> (ORGA_BASELINE) were computed with
+      <a href="https://github.com/chauff/ImageLocationEstimation">this</a> (mobility) and this (locale) toolkit respectively.
        
+    p.
+      <span style="background-color:#ff9999">Highlighted runs</span> are currently being processed by the backend. Please
+      refresh the leaderbaord from time to time to check the status.
   header(class='post-header')
     h2(class='post-title') Mobility Leaderboard
   div(class='post-description')
@@ -33,17 +39,21 @@ block content
             th(class='error') Latest Error (in km)
             th #Runs
             th Lowest Error (in km)
-          tbody
-            each r in mobilityRanking
-              if r.valid<0
-                tr(class='invalid')
-              else
-                tr
-                  td(class='firstCol') #{r.name}
-                  td #{Number(r.medianError/1000).toFixed(2)}
-                  td #{r.updates}
-                  td #{Number(r.medianError/1000).toFixed(2)}
-
+        tbody
+          each r in mobilityRanking
+            if r.valid<0
+              tr(class='invalid')
+                td(class='firstCol') #{r.name}
+                td #{Number(r.medianError/1000).toFixed(2)}
+                td #{r.updates}
+                td #{Number(r.medianError/1000).toFixed(2)}
+            else
+              tr
+                td(class='firstCol') #{r.name}
+                td #{Number(r.medianError/1000).toFixed(2)}
+                td #{r.updates}
+                td #{Number(r.medianError/1000).toFixed(2)}
+                             
   header(class='post-header')
     h2(class='post-title') Locale Leaderboard
   div(class='post-description')
@@ -54,13 +64,17 @@ block content
             th Latest Error (in km)
             th #Runs
             th Lowest Error (in km)
-          tbody
-            each r in localeRanking
-              if r.valid<0
-                tr(class='invalid')
-              else
-                tr
-                  td(class='firstCol') #{r.name}
-                  td #{Number(r.medianError/1000).toFixed(2)}
-                  td #{r.updates}
-                  td #{Number(r.medianError/1000).toFixed(2)}
+        tbody
+          each r in localeRanking
+            if r.valid<0
+              tr(class='invalid')
+                td(class='firstCol') #{r.name}
+                td #{Number(r.medianError/1000).toFixed(2)}
+                td #{r.updates}
+                td #{Number(r.medianError/1000).toFixed(2)}
+            else
+              tr
+                td(class='firstCol') #{r.name}
+                td #{Number(r.medianError/1000).toFixed(2)}
+                td #{r.updates}
+                td #{Number(r.medianError/1000).toFixed(2)}

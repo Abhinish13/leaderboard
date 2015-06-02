@@ -147,9 +147,7 @@ router.post('/runSubmission', Multer(
           if (err) {
             throw err;
           }
-          setTimeout(
-            app.geoAccuracy.computeError(req.body.token, filename, evalType), 0
-            );
+          app.geoAccuracy.computeErrorConcur(req.body.token, filename, evalType);
         });
       }
     }

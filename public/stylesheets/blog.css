@@ -161,8 +161,8 @@ td.firstCol {
   width: 15em;
 }
 
-tr.invalid {
-    background-color: darksalmon;
+tr.invalid td{
+    background-color: #ff9999 !important;
 }
 
 @media (min-width: 48em) {

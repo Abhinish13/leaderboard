@@ -1,10 +1,11 @@
 /* global app */
 var fs = require('fs');
 var geolib = require('geographiclib').Geodesic.WGS84;
+var child_process = require('child_process');
 
 var geoAccuracy = {
-	mobilityPoints: [],
-	localePoints: [],
+	mobilityPoints: {},
+	localePoints: {},
 	
 	initLocaleEval: function() {
 		geoAccuracy.initEval('./data/mediaeval2015_placing_locale_leaderboard', geoAccuracy.localePoints);
@@ -64,85 +65,32 @@ var geoAccuracy = {
 		return Object.keys(points).length;
 	},
 	
-	getDistanceInMeters : function(lat1, lng1, lat2, lng2) {
-		return geolib.Inverse(lat1, lng1, lat2, lng2).s12;
-	},
-	
-	//compute the error one item at a time
-	computeError: function (token, file, evalType) {
+	computeErrorConcur: function (token, file, evalType) {
 		
-		console.log("starting on computeError ....");
+		console.log('starting concurrent computeError function');
 		app.ranking.getItem(token, evalType).valid = -1;
-		
+		console.log('item is invalidated: '+app.ranking.getItem(token, evalType).valid);
 		var points = null;
 		if(evalType === 'locale') {
 			points = geoAccuracy.localePoints;
 		}
-		else if(evalType === 'mobility') {
+		else if (evalType === 'mobility') {
 			points = geoAccuracy.mobilityPoints;
 		}
-		else {;}		
+		else { ; }
 		
-		console.log("Computing the error");
-		var totalErrorDist = 0;
-		var validItems = 0;
-		var latErrors = 0;
-		var lngErrors = 0;
-		
-		var errorArray = [];
+		var childCompute = child_process.fork("geoAccuracy_child.js");
 
-		fs.readFile(file, 'utf8', function(err,data) {
-			if(err) {
-				console.log('Error when reading submission file: '+err);
-				return;
-			}
-			var lines = data.split(/\n/);
-			lines.forEach(function(line) {
-				var tokens = line.split(/;/);//separated by semi-colon, hash;latitude;longitude
-				var id = tokens[0];
-				var latitude = Number(tokens[1]);
-				var longitude = Number(tokens[2]);
-				
-				//our ground truth
-				if(id in points) {
-					var gtLatitude = points[id].latitude;
-					var gtLongitude = points[id].longitude;
-					
-					if(Math.abs(latitude)<=90 && Math.abs(longitude)<=180) {
-						var meters = geoAccuracy.getDistanceInMeters(latitude, longitude, gtLatitude, gtLongitude);
-						errorArray.push(meters);
-						totalErrorDist += meters;
-						validItems++;
-					}
-					
-					if (Math.abs(latitude) >= 91) {
-						latErrors++;
-					}
-					
-					if (Math.abs(longitude) >= 181) {
-						lngErrors++;
-					}
-				}
-			});
-			
-			if(validItems < geoAccuracy.getNumItems(evalType)/2) {
-				console.log('Less than half of all items present in submission');
-				app.ranking.updateItem(token,evalType,'NaN',file);
-				return;
-			}
-			var averageError = totalErrorDist / validItems;
-			var medianError = median(errorArray);
-
-			console.log("Number of latitude/longitude errors: " + latErrors+"/"+lngErrors);
-			console.log("Average error: " + averageError);
-			console.log("Median error: " + medianError);
-			
-			app.ranking.updateItem(token,evalType, medianError, file);
-			return;
+	    childCompute.on("message", function(message) {
+			var avError = message.avError;
+			var medError = message.medError;
+			console.log('Concurrent error computation finished');
+			console.log('Median error (in m): ' + medError);
+			console.log('Average error (in m): ' + avError);
+			app.ranking.updateItem(token,evalType, medError, file);
+			app.ranking.getItem(token, evalType).valid = 1;
 		});
-		
-		app.ranking.getItem(token, evalType).valid = 1;
-		console.log("ending on computeError ....");
+		childCompute.send({ file: file, gtPoints : JSON.stringify(points) });
 	}
 };
 
@@ -150,20 +98,6 @@ function Point(id, latitude, longitude) {
 	this.id = id;
 	this.longitude = longitude;
 	this.latitude = latitude;
-};
-
-function median(values) {
-
-    values.sort( function(a,b) {return a - b;} );
-
-    var half = Math.floor(values.length/2);
-
-    if (values.length % 2) {
-        return values[half];
-	}
-    else {
-        return (values[half - 1] + values[half]) / 2.0;
-	}
 };
 
 exports.geoAccuracy = geoAccuracy;
