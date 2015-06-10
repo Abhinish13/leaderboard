@@ -20,6 +20,13 @@ router.get('/register', function(req, res, next) {
   res.render('register');
 });
 
+/* GET submisson page (submitting a run) */
+router.get('/submit', function(req,res,next) {
+  res.render('submit');
+});
+
+
+
 /* GET registration token: 
   1. check whether the information is valid (and does not yet exst in teh user data)
   2. send a registration email with the necessary token
@@ -97,10 +104,7 @@ router.get('/receiveToken', function(req, res, next) {
 });
 
 
-/* GET submisson page (submitting a run) */
-router.get('/submit', function(req,res,next) {
-  res.render('submit');
-});
+
 
 
 /* submitted runs are sent by POST */
@@ -133,23 +137,25 @@ router.post('/runSubmission', Multer(
       if(lastSubmission !== null) {
         lastSubmission = new Date(lastSubmission).getTime();
       }
-      if(app.ranking.tokenExists(token) === false) {
-        res.render('error', { message:'Run upload failed: your token ' + token + ' is not valid.' });
+      if (app.ranking.tokenExists(token) === false) {
+        res.render('error', { message: 'Run upload failed: your token ' + token + ' is not valid.' });
       }
-      else if( lastSubmission !== null && Math.abs(currentTime - lastSubmission) < waitMilliseconds) {
+      else if (lastSubmission !== null && Math.abs(currentTime - lastSubmission) < waitMilliseconds) {
         var errorMsg = "Run upload failed: you have to wait at least "+waitMinutes+" minutes between subsequent submissions.";
-        res.render('error', { message: errorMsg });         
+        return res.render('error', { message: errorMsg });         
       }
-      else {
-        res.render('success', { message:'The upload was successful. It may take a few minutes until your new score appears on the leaderboard.' });
+      else {        
         //rename the file and then compute the error
         var filename = file.path + '_' + req.body.token + '_' + req.body.evalType;
         fs.rename(file.path, filename, function (err) {
           if (err) {
             LOGGER.error(err);
+            var errorMsg = "Something went wrong, please try again.";
+            return res.render('error', { message: errorMsg }); 
           }
           else {
             app.geoAccuracy.computeErrorConcur(req.body.token, filename, evalType);
+            return res.render('success', { message:'The upload was successful. It may take a few minutes until your new score appears on the leaderboard.' });
           }
         });
       }

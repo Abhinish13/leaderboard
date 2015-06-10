@@ -4,7 +4,6 @@ var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
 var multer = require('multer');
 var fs = require('fs');
 var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
@@ -12,11 +11,13 @@ var LOGGER = require('./logger');
 
 app = express();
 
-// view engine setup
+//development vs. production
+//in development mode, stack traces are visible on the Web page
+app.set('env', config["env"]);
+LOGGER.info('Web app environment: ' + app.get('env')+ ' (note: only \"development\" prints out stack traces)');
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-app.use(logger('dev'));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 var routes = require('./routes/all');
@@ -50,6 +51,7 @@ if (app.get('env') === 'development') {
       message: err.message,
       error: err
     });
+    LOGGER.error(err.message);
   });
 }
 

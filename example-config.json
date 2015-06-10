@@ -12,5 +12,6 @@
 								 "please contact us at example@gamil.com.\n\n",
 								 "Best of luck!\n\n",
 								 "-- the organizers\n"],
-	"milliseconds-between-uploads": "300000"
+	"milliseconds-between-uploads": "300000",
+	"env": "development"
 }
