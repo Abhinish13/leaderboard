@@ -16,7 +16,8 @@
     "serve-favicon": "~2.2.1",
     "mocha": "~2.2.5",
     "geographiclib": "~1.0.4",
-    "winston": "~0.5.11"
+    "winston": "~0.5.11",
+    "rand-token": "~0.2.1"
   },
   "description": "Leaderboard app developed for the Placing Task 2015 @ MediaEval",
   "main": "app.js",
