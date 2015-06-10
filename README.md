@@ -9,3 +9,5 @@ and should not be used as an example of how to design Web apps.
 Replace the `example-config.json` file with the actual login/password of an STMP-enabled email account.
 
 Start the application with `npm start`
+
+Run the tests with `npm test`
