@@ -13,5 +13,5 @@
 								 "Best of luck!\n\n",
 								 "-- the organizers\n"],
 	"milliseconds-between-uploads": "300000",
-	"env": "development"
+	"env": "production"
 }
