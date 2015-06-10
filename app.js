@@ -7,14 +7,14 @@ var logger = require('morgan');
 var multer = require('multer');
 var fs = require('fs');
 var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
-var LOGGER = require('./logger'); 
+var LOGGER = require('./logger.js'); 
 
 app = express();
 
 //development vs. production
 //in development mode, stack traces are visible on the Web page
 app.set('env', config["env"]);
-LOGGER.info('Web app environment: ' + app.get('env')+ ' (note: only \"development\" prints out stack traces)');
+LOGGER.info('Web app environment: ' + app.get('env')+ ' (note: only the \"development\" environment shows stack traces client-side)');
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

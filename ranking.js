@@ -10,14 +10,26 @@ var ranking = {
 	//each evaluation type is backed up to a separate file
 	backupFiles: ['./data/backup-ranking-mobility', './data/backup-ranking-locale'],
 	
-	//return the number of items per evaluation type 
-	getNumItems: function (evalType) {
-		var items = null;
+	//returns the correct array for each evaluation type
+	//for object internal use only
+	_getItems: function (evalType) {
 		if (evalType === 'locale') {
-			items = ranking.localeItems;
+			return ranking.localeItems;
 		}
 		else if (evalType === 'mobility') {
-			items = ranking.mobilityItems;
+			return ranking.mobilityItems;
+		}
+		else {
+			LOGGER.error("Invalid ranking type requested!");
+			return null;
+		}
+	},
+	
+	//return the number of items per evaluation type 
+	getNumItems: function (evalType) {
+		var items = ranking._getItems(evalType);
+		if (items === null) {
+			return items;
 		}
 		return items.length;
 	},
@@ -25,15 +37,10 @@ var ranking = {
 	//returns an Item object for a given token 
 	//or null, if the item does not exist
 	getItem: function (token, evalType) {
-		var items = null;
-		if (evalType === 'locale') {
-			items = ranking.localeItems;
+		var items = ranking._getItems(evalType);
+		if (items === null) {
+			return items;
 		}
-		else if (evalType === 'mobility') {
-			items = ranking.mobilityItems;
-		}
-		else { ; }
-
 		for (var i in items) {
 			if (items[i].token === token) {
 				return items[i];
@@ -42,42 +49,35 @@ var ranking = {
 		return null;
 	},
 
-	getLastSubmissionDate: function (token, evalType) {
+	//for object internal use only
+	_getItemProperty: function (token, evalType, property) {
 		var item = this.getItem(token, evalType);
 		if (item !== null) {
-			return item.lastSubmission;
+			return item[property];
 		}
-		return null;
+		return null;		
+	},
+	
+	getLastSubmissionDate: function (token, evalType) {
+		return ranking._getItemProperty(token, evalType, "lastSubmission");
 	},
 	
 	//returns the average error of a particular item
 	getMedianError: function (token, evalType) {
-		var item = this.getItem(token, evalType);
-		if (item !== null) {
-			return item.medianError;
-		}
-		return null;
+		return ranking._getItemProperty(token, evalType, "medianError");
 	},
 
 	//number of updates (number of submissions) a team made
 	getNumUpdates: function (token, evalType) {
-		var item = this.getItem(token, evalType);
-		if (item !== null) {
-			return item.updates;
-		}
-		return null;
+		return ranking._getItemProperty(token, evalType, "updates");
 	},
 
 	teamNameExists: function (name, evalType) {
-		var items = null;
-		if (evalType === 'locale') {
-			items = ranking.localeItems;
+		var items = ranking._getItems(evalType);
+		if (items === null) {
+			return items;
 		}
-		else if (evalType === 'mobility') {
-			items = ranking.mobilityItems;
-		}
-		else { ; }
-
+		
 		for (var i in items) {
 			if (items[i].name.toLowerCase() === name.toLowerCase()) {
 				return true;
@@ -87,14 +87,10 @@ var ranking = {
 	},
 
 	emailExists: function (email, evalType) {
-		var items = null;
-		if (evalType === 'locale') {
-			items = ranking.localeItems;
+		var items = ranking._getItems(evalType);
+		if (items === null) {
+			return items;
 		}
-		else if (evalType === 'mobility') {
-			items = ranking.mobilityItems;
-		}
-		else { ; }
 
 		for (var i in items) {
 			if (items[i].email.toLowerCase() === email.toLowerCase()) {

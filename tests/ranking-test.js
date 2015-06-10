@@ -7,43 +7,41 @@ describe('tests', function(){
     describe('ranking', function(){
         
         it('empty ranking', function(){
-            assert.equal(0, r.getNumItems());
+            assert.equal(0, r.getNumItems('locale'));
         });
         
         var randomToken = randtoken.generate(10);
+        var eval = 'locale';
         
         it('single addition', function(){
  
             var teamName = "ABC";
-            r.addItem(randomToken, teamName);
-            assert.equal(1, r.getNumItems());
-            assert.equal(true, r.exists(randomToken));
+            var email = "test@test.de";
+            r.addItem(randomToken, teamName, email);
+            assert.equal(1, r.getNumItems(eval));
+            assert.equal(true, r.tokenExists(randomToken));
         });
         
          it('single update', function(){
-            var s = r.updateItem(randomToken, "0.5", "test-file", "blah");
+            var s = r.updateItem(randomToken, eval, 0.5, "_file1");
             assert.ok(s);
-            assert.equal(1, r.getNumItems());
-            assert.equal(0.5, r.getAvError(randomToken));
-            //using the same random token should not yield in a successful change
-            r.addItem(randomToken, "CDE");
-            assert.equal(1, r.getNumItems());
+            assert.equal(1, r.getNumItems(eval));
+            assert.equal(0.5, r.getMedianError(randomToken, eval));
         });     
         
          it('list of operations', function(){
-            r.addItem(123,"XYZ");
-            r.addItem(234,"DFG");
+            r.addItem(123,"XYZ", "X@X.x");
+            r.addItem(234,"DFG", "D@D.d");
             
-            r.updateItem(123, "1.23", "", "semi okay");
-            r.updateItem(234, "1");
-            r.updateItem(234, "5000");
+            r.updateItem(123, eval, 1.23, "_file2");
+            r.updateItem(234, eval, 1, "_file3");
+            r.updateItem(234, eval, 2, "_file4");
 
-            assert.equal(3, r.getNumItems());
-            assert.equal(5000, r.getAvError(234));
-            assert.equal(null, r.getAvError("fdsfsdfsd"));
-            assert.equal(1, r.getNumUpdates(randomToken));
-            assert.equal(2, r.getNumUpdates(234));
-            assert.equal(null, r.getNumUpdates("dsfdsfdsds"));
+            assert.equal(3, r.getNumItems(eval));
+            assert.equal(2, r.getMedianError(234, eval));
+            assert.equal(null, r.getMedianError("fdsfsdfsd", eval));
+            assert.equal(1, r.getNumUpdates(randomToken, eval));
+            assert.equal(2, r.getNumUpdates(234, eval));
         });    
     });
 })

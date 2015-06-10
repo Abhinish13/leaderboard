@@ -81,3 +81,5 @@ function median(values) {
 function getDistanceInMeters(lat1, lng1, lat2, lng2) {
 	return geolib.Inverse(lat1, lng1, lat2, lng2).s12;
 };
+
+exports.getDistanceInMeters = getDistanceInMeters;
