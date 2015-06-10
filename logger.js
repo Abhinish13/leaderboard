@@ -3,15 +3,11 @@ var LOGGER = require('winston');
 LOGGER.setLevels({
     debug:0,
     info: 1,
-    silly:2,
-    warn: 3,
-    error:4,
+    error: 2
 });
 LOGGER.addColors({
     debug: 'green',
-    info:  'cyan',
-    silly: 'magenta',
-    warn:  'yellow',
+    info:  'yellow',
     error: 'red'
 });
 
