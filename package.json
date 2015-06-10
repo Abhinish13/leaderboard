@@ -14,7 +14,8 @@
     "jade": "~1.9.2",
     "morgan": "~1.5.3",
     "serve-favicon": "~2.2.1",
-    "mocha": "~2.2.5"
+    "mocha": "~2.2.5",
+    "geographiclib": "1.0.4"
   },
   "description": "Leaderboard app developed for the Placing Task 2015 @ MediaEval",
   "main": "app.js",
