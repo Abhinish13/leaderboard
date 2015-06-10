@@ -1,6 +1,7 @@
 /* global process */
 var fs = require('fs');
 var geolib = require('geographiclib').Geodesic.WGS84;
+var LOGGER = require('./logger'); 
 
 process.on("message", function (message) {
 	var file = message.file;
@@ -16,12 +17,13 @@ process.on("message", function (message) {
 	fs.readFile(file, 'utf8', function (err, data) {
 		if (err) {
 			var msg = "Error when reading submission file " + file;
+			LOGGER.error(msg);
 			process.send({ error: msg, avError : 'NaN', medError : 'NaN' });
 			process.exit();
 		}
 		var lines = data.split(/\n/);
 		lines.forEach(function (line) {
-			var tokens = line.split(/;/);//separated by semi-colon, hash;latitude;longitude
+			var tokens = line.split(/;/);//format is separated by semi-colon, hash;latitude;longitude
 
 			var id = tokens[0];
 			var latitude = Number(tokens[1]);
@@ -49,7 +51,8 @@ process.on("message", function (message) {
 		});
 
 		if (validItems < Object.keys(points).length / 2) {
-			msg = "Error: less than half of all items present in submission";
+			msg = "Warning: less than half of all items present in submission";
+			LOGGER.info(msg);
 			process.send({ error: msg, avError : 'NaN', medError : 'NaN' });
 			process.exit();
 		}

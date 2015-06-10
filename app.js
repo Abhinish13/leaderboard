@@ -8,6 +8,7 @@ var cookieParser = require('cookie-parser');
 var multer = require('multer');
 var fs = require('fs');
 var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+var LOGGER = require('./logger'); 
 
 app = express();
 
@@ -32,7 +33,6 @@ var geoAccuracy = require('./geoAccuracy.js').geoAccuracy;
 geoAccuracy.initLocaleEval();
 geoAccuracy.initMobilityEval();
 app.geoAccuracy = geoAccuracy;
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

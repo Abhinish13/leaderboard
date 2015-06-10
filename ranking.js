@@ -1,4 +1,5 @@
 var fs = require('fs');
+var LOGGER = require('./logger'); 
 
 var ranking = {
 	
@@ -148,7 +149,7 @@ var ranking = {
 	},
 
 	backup: function () {
-		console.log('Backing up the ranking ...');
+		LOGGER.info('Backing up the ranking ...');
 		ranking._backup(this.mobilityItems, ranking.backupFiles[0]);
 		ranking._backup(this.localeItems, ranking.backupFiles[1]);
 	},
@@ -165,7 +166,7 @@ var ranking = {
 	},
 
 	loadFromBackup: function () {
-		console.log('Loading ranking from backup ....');
+		LOGGER.info('Loading ranking from backup ....');
 		ranking._loadFromBackup(this.mobilityItems, ranking.backupFiles[0]);
 		ranking._loadFromBackup(this.localeItems, ranking.backupFiles[1]);
 	},
@@ -173,7 +174,7 @@ var ranking = {
 	_loadFromBackup: function (items, file) {
 		fs.readFile(file, 'utf8', function (err, data) {
 			if (err) {
-				console.log('Error when loading the backuped ranking from ' + file);
+				LOGGER.error('Error when loading the backuped ranking from ' + file);
 				return;
 			}
 			var lines = data.split(/\n/);

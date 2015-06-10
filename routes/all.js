@@ -5,6 +5,7 @@ var Multer = require('multer');
 var nodemailer = require('nodemailer');
 var randtoken = require('rand-token');
 var fs = require('fs');
+var LOGGER = require('../logger'); 
 
 /* GET current leaderboard */
 router.get('/', function(req, res, next) {
@@ -28,7 +29,7 @@ router.get('/receiveToken', function(req, res, next) {
   var teamName = req.query.teamName;
   var email = req.query.email;
   
-  console.log('Registration request received from ' + email + ' (team )'+teamName);
+  LOGGER.info('Registration request received from ' + email + ' (team )'+teamName);
   
   //alphanumeric chars and underscore are allowed in the team name
   //min. 3, max. 15 characters
@@ -39,7 +40,7 @@ router.get('/receiveToken', function(req, res, next) {
       res.render('error', { message:'Team registration unsuccessful: this team name is already registered.' });
   }
   else if( ! re1.test(teamName)) {
-    res.render('error', {   message:'Team registration unsuccessful: the team name is invalid.' });
+    res.render('error', { message:'Team registration unsuccessful: the team name is invalid.' });
   }
 //multiple tokens can be requested by the same participant  
 //  else if(app.ranking.emailExists(email) === true ) {
@@ -78,9 +79,9 @@ router.get('/receiveToken', function(req, res, next) {
         }, 
         function(error, info){
           if(error){
-            console.log(error);
+            LOGGER.error(error);
           }else{
-            console.log('Registration email sent: ' + info.response);
+            LOGGER.info('Registration email sent: ' + info.response);
           }
       });
       var success = app.ranking.addItem(randomToken, teamName, email);
@@ -145,9 +146,11 @@ router.post('/runSubmission', Multer(
         var filename = file.path + '_' + req.body.token + '_' + req.body.evalType;
         fs.rename(file.path, filename, function (err) {
           if (err) {
-            throw err;
+            LOGGER.error(err);
           }
-          app.geoAccuracy.computeErrorConcur(req.body.token, filename, evalType);
+          else {
+            app.geoAccuracy.computeErrorConcur(req.body.token, filename, evalType);
+          }
         });
       }
     }

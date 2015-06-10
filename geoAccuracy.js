@@ -2,6 +2,7 @@
 var fs = require('fs');
 var geolib = require('geographiclib').Geodesic.WGS84;
 var child_process = require('child_process');
+var LOGGER = require('./logger');  
 
 var geoAccuracy = {
 	mobilityPoints: {},
@@ -17,15 +18,17 @@ var geoAccuracy = {
 	
 	//read the public leaderboard items into memory (should only called within geoAccuracy)
 	initEval: function (file, points) {
-		console.log('Initializing the evaluation of '+file);
-		if(file === undefined) {
+		
+		LOGGER.info('Initializing the evaluation of '+file);
+		if (file === undefined) {
+			LOGGER.error('File ' + file + ' could not be read!');
 			return;
 		}
 		var latErrors = 0;
 		var lngErrors = 0;
 		fs.readFile(file, 'utf8',function(err, data) {
 			if(err) {
-				console.log('Initialization error: '+err);
+				LOGGER.error('Initialization error: '+err);
 				return;
 			}
 			var lines = data.split("\n");
@@ -37,15 +40,15 @@ var geoAccuracy = {
 				var latitude = tokens[2];
 				points[tokens[0]] = new Point(tokens[0], latitude, longitude);
 				
-				if (Math.abs(latitude) > 91) {
+				if (Math.abs(Number(latitude)) > 91) {
 					latErrors++;
 				}
-				if (Math.abs(longitude) > 180) {
+				if (Math.abs(Number(longitude)) > 180) {
 					lngErrors++;
 				}
 			});
-			console.log("Number of evaluation items: "+Object.keys(points).length);
-			console.log("Number of times latitude/longitude was out of bounds: " + latErrors+"/"+lngErrors);
+			LOGGER.info("Number of evaluation items: "+Object.keys(points).length);
+			LOGGER.info("Number of times latitude/longitude was out of bounds: " + latErrors+"/"+lngErrors);
 		});
 	},
 	
@@ -67,9 +70,9 @@ var geoAccuracy = {
 	
 	computeErrorConcur: function (token, file, evalType) {
 		
-		console.log('starting concurrent computeError function');
+		LOGGER.info('starting concurrent computeError function');
 		app.ranking.getItem(token, evalType).valid = -1;
-		console.log('item is invalidated: '+app.ranking.getItem(token, evalType).valid);
+
 		var points = null;
 		if(evalType === 'locale') {
 			points = geoAccuracy.localePoints;
@@ -84,9 +87,9 @@ var geoAccuracy = {
 	    childCompute.on("message", function(message) {
 			var avError = message.avError;
 			var medError = message.medError;
-			console.log('Concurrent error computation finished');
-			console.log('Median error (in m): ' + medError);
-			console.log('Average error (in m): ' + avError);
+			
+			LOGGER.info('Concurrent error computation finished, median error in meters: '+medError);
+
 			app.ranking.updateItem(token,evalType, medError, file);
 			app.ranking.getItem(token, evalType).valid = 1;
 		});
