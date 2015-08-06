@@ -9,8 +9,14 @@ var LOGGER = require('../logger');
 
 /* GET current leaderboard */
 router.get('/', function(req, res, next) {
-  res.render('leaderboard', { mobilityRanking: app.ranking.mobilityItems.sort(app.ranking.ascSort), 
-                              localeRanking:app.ranking.localeItems.sort(app.ranking.ascSort)
+//  res.render('leaderboard', { mobilityRanking: app.ranking.mobilityItems.sort(app.ranking.ascSort), 
+//                              localeRanking:app.ranking.localeItems.sort(app.ranking.ascSort)
+  res.render('leaderboard', { mobilityRanking: app.ranking.mobilityItems.sort(function(obj1, obj2) {
+	                                 return (obj1.minError === 'NaN' ? 1000000000 : obj1.minError)  - (obj2.minError === 'NaN' ? 1000000000 : obj2.minError);
+                                }), 
+                                localeRanking:app.ranking.localeItems.sort(function(obj1, obj2) {
+	                                 return (obj1.minError === 'NaN' ? 1000000000 : obj1.minError)  - (obj2.minError === 'NaN' ? 1000000000 : obj2.minError);
+                                })
   });
 });
 
@@ -145,6 +151,7 @@ router.post('/runSubmission', Multer(
         return res.render('error', { message: errorMsg });         
       }
       else {        
+        LOGGER.info("Renaming uploaded file");
         //rename the file and then compute the error
         var filename = file.path + '_' + req.body.token + '_' + req.body.evalType;
         fs.rename(file.path, filename, function (err) {
@@ -154,6 +161,7 @@ router.post('/runSubmission', Multer(
             return res.render('error', { message: errorMsg }); 
           }
           else {
+            LOGGER.info("Upload successful");
             app.geoAccuracy.computeErrorConcur(req.body.token, filename, evalType);
             return res.render('success', { message:'The upload was successful. It may take a few minutes until your new score appears on the leaderboard.' });
           }

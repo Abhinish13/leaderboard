@@ -126,15 +126,20 @@ var ranking = {
 	//update the score of an existing item
 	//returns true if an update occurred, false otherwise
 	updateItem: function (token, evalType, medianError, submissionFile) {
+		
 		var item = this.getItem(token, evalType);
 		if (item === null) {
 			return false;
 		}
+		console.log("Updating item!");
+		console.log("Minimum error: " + item.minError);		
+		
 		item.medianError = medianError;
 		item.file = submissionFile;
 		item.updates++;
 
-		if (item.minError === '' || item.minError > item.medianError) {
+		if (item.minError === '' || item.minError > item.medianError || item.minError === 'NaN') {
+			console.log("Changing minimum Error to " + item.medianError);
 			item.minError = item.medianError;
 			item.minErrorFile = item.file;
 		}
@@ -184,6 +189,7 @@ var ranking = {
 	},
 
 	ascScort: function (a, b) {
+		console.log("Ascending sort!");
 		if (a.minError === 'NaN') {
 			return 1;
 		}
