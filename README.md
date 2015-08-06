@@ -11,3 +11,5 @@ Replace the `example-config.json` file with the actual login/password of an STMP
 Start the application with `npm start`
 
 Run the tests with `npm test`
+
+Note that some necessary data files (such as the ground truth locale/mobility task data) are not included in this repository (as the contest is currently running).
