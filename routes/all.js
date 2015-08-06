@@ -151,7 +151,6 @@ router.post('/runSubmission', Multer(
         return res.render('error', { message: errorMsg });         
       }
       else {        
-        LOGGER.info("Renaming uploaded file");
         //rename the file and then compute the error
         var filename = file.path + '_' + req.body.token + '_' + req.body.evalType;
         fs.rename(file.path, filename, function (err) {

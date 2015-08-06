@@ -187,17 +187,6 @@ var ranking = {
 			});
 		});
 	},
-
-	ascScort: function (a, b) {
-		console.log("Ascending sort!");
-		if (a.minError === 'NaN') {
-			return 1;
-		}
-		if (b.minError === 'NaN') {
-			return -1;
-		}
-		return parseFloat(a.minError) - parseFloat(b.minError);
-	}
 };
 
 function Item(token, name, email) {

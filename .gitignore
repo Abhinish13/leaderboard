@@ -4,4 +4,3 @@ uploads/*
 config.json
 *.log
 .settings
-bin/*
