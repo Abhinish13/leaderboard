@@ -6,10 +6,10 @@ Prototype leaderboard for the Placing Task at MediaEval 2015.
 This code was cobbled together over a few days (replicate at your own risk).
 
 # Instructions 
-Replace the `example-config.json` file with the actual login/password of an STMP-enabled email account.
+Replace the `example-config.json` file with the actual login/password of an STMP-enabled email account. Create a folder `uploads` in which the files submitted to the leaderboard will be written to.
 
 Start the application with `npm start`
 
 Run the tests with `npm test`
 
-Note that some necessary data files (such as the ground truth locale/mobility task data) are not included in this repository (as the contest is currently running).
+In the data folder, the part of the test set used in MediaEval 2015 for the leaderboard computations are included.
