@@ -11,19 +11,19 @@ Install Node.JS and NPM:
 + For RHEL6 machines this can be done by running `curl -sL https://rpm.nodesource.com/setup_6.x | sudo -E bash -`.
 
 Install Dependencies:
-+ Run `npm install` in the directory where the archive was unpacked to install the dependencies a leaderboard needs in order to run.
++ Run `npm install` in the directory where the archive was unpacked to install the dependencies the leaderboard needs in order to run.
 
 ## Instructions ##
 
-## Create the leaderboard ##
+*Create the leaderboard*
 + Look at the structure and contents of both the `placing` and `tagcaption` directories for inspiration.
-+ Add, remove or modify the front-end files (the .pug files in the 'views' subdirectory and the corresponding images and stylesheets in the 'public' subdirectory) and the back-end files (the .js files) so it looks and works the way you want it.
-+ Replace the files in the 'evaluation' subdirectory with your own data, as well as to change the email templates in the 'emailer' directory.
++ Add, remove or modify the front-end files (the .pug files in the 'views' subdirectory and the corresponding images and stylesheets in the 'public' subdirectory) and the back-end files (the .js files) so it looks and works the way you want.
++ Replace the files in the 'evaluation' subdirectory with your own data, and change the email templates in the 'emailer' directory.
 
-### Configure the leaderboard ###
+*Configure the leaderboard*
 + Update the path in the `app.js` file to point to the subdirectory where your leaderboard resides.
 + Replace the placeholder login/password of an STMP-enabled email account in the `config.json` file located in the leaderboard subdirectory. The easiest is to create a new Gmail address, enable two-factor authentication, and then create an app-specific password (this will allow you to hide the real password of the account and to easily create disposable passwords, which is useful in the case of an accidental commit to GitHub).
-+ Start the application with `npm start` from the root directory.
++ Start the application with `npm start` from the directory where the archive was unpacked.
 + Access the leaderboard locally at `http://localhost:8080`, or at the port you specified in the config file.
 + Consider using Amazon AWS or another cloud computing service to easily host the leaderboard online.
 
