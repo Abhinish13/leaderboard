@@ -1,0 +1,40 @@
+doctype html
+html
+	head
+		title Leaderboard
+		link(rel='stylesheet', href='/stylesheets/pure.css')
+		link(rel='stylesheet', href='/stylesheets/blog.css') 
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
+	body
+		div(class='pure-g')
+			div(class='sidebar pure-u-1 pure-u-md-1-4')
+				div(class='header')
+					h1(class='brand-title') Yahoo-Flickr<br>Tag and Caption<br>Prediction<br>Challenge 2016
+					h2(class='brand-tagline') Live Leaderboard
+					br
+					nav(class='nav')
+						ul(class='nav-list')
+							li(class='nav-item')
+								a(href='./', class='pure-button') Home
+							br
+							li(class='nav-item')
+								a(href='./add', class='pure-button') Add registration
+							li(class='nav-item')
+								a(href='./update', class='pure-button') Update registration
+							li(class='nav-item')
+								a(href='./remove', class='pure-button') Remove registration
+							br
+							li(class='nav-item')
+								a(href='./submit', class='pure-button') Submit a run
+							li(class='nav-item')
+								a(href='./tag', class='pure-button') Tag leaderboard
+							li(class='nav-item')
+								a(href='./caption', class='pure-button') Caption leaderboard
+
+			div(class='content pure-u-1 pure-u-md-3-4')
+				div
+					div(class='posts')
+						section(class='post')
+							block content
+					

@@ -1,0 +1,38 @@
+extends layout.pug
+
+block content
+	header(class='post-header')
+		h2(class='post-title') Submit a run
+	div(class='post-description')
+		p.
+			Each token can be used for only <span class='important'>one submission every 2 hours</span>.	
+		p.
+			If the leaderboard records an 'NaN' for your submission, double-check the format of your submission.
+
+		form(action='submission', name='submission', method='post', enctype='multipart/form-data', class='pure-form pure-form-stacked')
+			fieldset
+				div(class='pure-content-group')
+					label(for='token') Token
+					input(type='text', id='token', name='token', required, pattern='^[A-Za-z0-9]{24}$', placeholder='Enter your token', size='30')
+				div(class='pure-content-group')
+					label(for='run') Run file
+					input(type='file', id='run', name='run', required, size='100')
+				div(class='pure-content-group')
+					label(for='description') Description
+					textarea(id='description', name='description', placeholder='Enter a short description of your method (optional)', cols='60', rows='5')
+				div(class='pure-content-group')
+					label(for='subtask') Subtask
+					input(type='radio', id='estimation', name='subtask', value='estimation', checked)
+					| &nbsp; Estimation &nbsp;
+					input(type='radio', id='verification', name='subtask', value='verification')
+					| &nbsp; Verification &nbsp;
+				div(class='pure-content-group')
+					label(for='modality') Modality
+					input(type='radio', id='photo', name='modality', value='photo', checked)
+					| &nbsp; Photo &nbsp;
+					input(type='radio', id='video', name='modality', value='video')
+					| &nbsp; Video &nbsp;
+				div(class='pure-content-group')
+					label(for='submit') Note: For the estimation subtask, the expected format of each line in your submission is <code>[photoid/videoid]\t[longitude]\t[latitude]</code>, while for the verification the expected format is <code>[photoid/videoid]\t[0 or 1]</code>. Upload and evaluation may take a few minutes, so please be patient. 
+					input(type='submit', id='submit', name='submit', value='Upload \& Evaluate', class='pure-button pure-button-primary')
+		

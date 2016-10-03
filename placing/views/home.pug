@@ -1,0 +1,28 @@
+extends layout.pug
+
+block content
+	header(class='post-header')
+		h2(class='post-title') Welcome to the Placing Task!
+	div(class='post-description')
+		p
+			| This leaderboard is meant as an assistive tool for helping participants in the MediaEval Placing task get a sense of the performance of their algorithms, as well as to see the relative standing of their performance versus others.
+			
+		p
+			| The objective of the task is, given a photo or video, to predict or verify the location where it was taken. 
+			b Full details on the task and how to participate can be found #[a(href='http://multimediaeval.org/mediaeval2016/placing/')= 'here']. 
+			| While in the last decade the accuracy of location predictions has improved considerably, the prediction quality seems to have plateaued in the last two years - is it possible to exploit recent algorithms and improvements to push the envelope even further?
+		
+		p
+			| To illustrate, the photo below was taken by the photographer Juan Miguel Barnal and was given the title <font face='courier'>Gondolas?</font>, without any tags or description. It was taken in Venice, Italy.
+		
+		p(align='center')
+			img(src='/images/6941214332.jpg')
+			
+		p
+			| This particular photo is noteworthy in that its visual content is very descriptive of the location, showing the typical boats used in Venice, and showing the San Giorgio Maggiore island in the background.
+			| However there is still plenty of ambiguity that can be resolved by analyzing the textual metadata, user metadata and other relevant metadata.
+		p
+			| In this specific example the textual component, i.e. the word <font face='courier'>gondolas</font> is useful for narrowing down where the photo may have been taken - a gondola can also refer to the transportation device used to get people up to the top of a mountain and is often seen in the Alps in Europe. The visual component is useful for distinguishing between the two modes of transport. Nonetheless, in Las Vegas there is a well-known hotel, the Venetian, which imitates parts of Venice including the gondolas, and as such makes it still difficult to decide where the photo was really taken. Fortunately, there are other clues as well - other photos taken by the same photographer on the same day more clearly refer to Venice, and even though this particular photo didn't contain any user tags, there are several machine tags associated with it of which one refers to a specific Foursquare venue, namely the Leone di San Marco in Venice.
+		p
+			| The dataset contains a variety of photos and videos that vary in difficulty of predicting or verifying where they were taken.
+			| We welcome your participation!

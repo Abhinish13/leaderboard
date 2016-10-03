@@ -1,0 +1,42 @@
+code {
+    padding: 0;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    margin: 0;
+    font-size: 85%;
+    background-color: rgba(0,0,0,0.04);
+    border-radius: 3px;
+}
+
+td.verified {
+	text-align: center;
+	/*width: 3em;*/
+}
+
+/*td.team {
+	width: 20em;
+}
+
+td.timestamp {
+	width: 30em;
+}
+
+td.score {
+	width: 4em;
+}
+
+td.comment {
+	width: 25em;
+}*/
+
+tr.active td {
+	background-color: #ffa500 !important;
+}
+
+tr.invalid td {
+	background-color: #ff9999 !important;
+}
+
+.pure-form textarea {
+	font-size: 12.8px;
+}

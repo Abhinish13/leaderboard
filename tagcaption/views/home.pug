@@ -1,0 +1,24 @@
+extends layout.pug
+
+block content
+	header(class='post-header')
+		h2(class='post-title') Welcome to the Tag and Caption Prediction Challenge!
+	div(class='post-description')
+		p
+			| This leaderboard is meant as an assistive tool for helping participants in the Yahoo-Flickr Tag and Caption prediction challenge get a sense of the performance of their algorithms, as well as to see the relative standing of their performance versus others.
+			
+		p
+			| The objective of the challenge is, given a photo, to predict the tags and the caption that someone has given to this photo. 
+			b Full details on the challenge and how to participate can be found #[a(href='http://mmcommons.org/tag-caption-prediction-challenge/')= 'here']. 
+			| The challenge is certainly not easy, but it's objective is noble: in the context of photography, is it possible to devise an algorithm that really is able to think like a human?
+		
+		p
+			| To illustrate, the photo below was taken by the photographer Dan Nguyen and was given the title <font face='courier'>Airline pilots protest Wall Street</font>, as well as the tags <font face='courier'>event</font>, <font face='courier'>landscape</font>, <font face='courier'>people</font>, <font face='courier'>protest</font>, <font face='courier'>rally</font> and <font face='courier'>urban</font>.
+		
+		p(align='center')
+			img(src='/images/6190171031.jpg')
+			
+		p
+			| This particular photo is noteworthy in that its tags are very descriptive of the content, while the caption reflects knowledge that is not directly obvious when looking at the scene (e.g. the event is a protest, rather than a commemoration march).
+			| The dataset contains a variety of photos that vary in difficulty of predicting their captions and tags.
+			| We welcome your participation!

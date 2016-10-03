@@ -1,0 +1,25 @@
+extends layout.pug
+
+block content
+	header(class='post-header')
+		h2(class='post-title') Remove registration
+	div(class='post-description')
+		p.
+			To unregister, enter your name, email address and the token you were given. After clicking the 'remove' button your account will be removed.
+
+		form(action='remove', name='unregister', method='post', class='pure-form pure-form-stacked')
+			fieldset
+				div(class='pure-control-group')
+					label(for='name') Name
+					input(type='text', id='name', name='name', required, pattern='^[A-Za-z0-9-_]{1,24}$', placeholder='Enter your name', size='45')
+				div(class='pure-control-group')
+					label(for='email') Email
+					input(type='email', id='email', name='email', required, placeholder='Enter your email address', size='45')
+				div(class='pure-control-group')
+					label(for='token') Token
+					input(type='token', id='token', name='token', required, pattern='^[A-Za-z0-9]{24}$', placeholder='Enter your token', size='30')
+				div(class='pure-control-group')
+					| &nbsp;
+				div(class='pure-control-group')
+					input(type='submit', value='Remove', class='pure-button pure-button-primary')
+					

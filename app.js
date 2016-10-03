@@ -1,70 +1,61 @@
-/* global app */
-/// <reference path="typings/node/node.d.ts"/>
-var express = require('express');
+// global imports
+var fs = require('fs.extra');
 var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var multer = require('multer');
-var fs = require('fs');
-var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
-var LOGGER = require('./logger.js'); 
+var bodyparser = require('body-parser')
 
+// create application
+var express = require('express');
 app = express();
+// set directory
+app.dir = __dirname;
+// set configuration
+app.config = JSON.parse(fs.readFileSync('placing/config.json', 'utf8'));
+// set logger
+app.logger = require(path.join(app.dir, app.config['base-dir'], app.config['logger-code']));
+// set database
+app.database = require(path.join(app.dir, app.config['base-dir'], app.config['db-code']));
+// set emailer
+app.emailer = require(path.join(app.dir, app.config['base-dir'], app.config['email-code']));
+// support parameter encodings
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({ extended: true }));
+// set view rendering engine
+app.set('view engine', 'pug');
+// set view pages
+app.set('views', path.join(app.dir, app.config['base-dir'], app.config['views-dir']));
+app.use(express.static(path.join(app.dir, path.join(app.config['base-dir'], 'public'))));
+var views = require(path.join(app.dir, app.config['base-dir'], app.config['views-code']));
+app.use('/', views);
 
-//development vs. production
-//in development mode, stack traces are visible on the Web page
-app.set('env', config["env"]);
-LOGGER.info('Web app environment: ' + app.get('env')+ ' (note: only the \"development\" environment shows stack traces client-side)');
-
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-app.use(express.static(path.join(__dirname, 'public')));
-
-var routes = require('./routes/all');
-app.use('/', routes);
-
-app.config = config;
-
-//create a default ranking for development purposes
-var ranking = require('./ranking.js').ranking;
-app.ranking = ranking;
-app.ranking.loadFromBackup();
-
-var geoAccuracy = require('./geoAccuracy.js').geoAccuracy;
-geoAccuracy.initLocaleEval();
-geoAccuracy.initMobilityEval();
-app.geoAccuracy = geoAccuracy;
-
-// catch 404 and forward to error handler
+// 404 error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+	var err = new Error('Not Found');
+	err.status = 404;
+	next(err);
 });
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-    LOGGER.error(err.status + ": " + err.message);
-  });
+// default error handler depends on the environment
+app.set('env', app.config["server-env"]);
+if (app.get('env') == 'development') {
+	// development mode prints stack trace
+	app.use(function(err, req, res, next) {
+		res.status(err.status || 500);
+		res.render('response', {
+			message: err.message,
+			error: err
+		});
+		app.logger.error(err.status + ": " + err.message);
+	});
+} else {
+	// production mode does not print stack trace to the user
+	app.use(function(err, req, res, next) {
+		res.status(err.status || 500);
+		res.render('response', {
+			message: "",
+			error: {}
+		});
+		app.logger.error(err.status + ": " + err.message);
+	});
 }
 
-  // production error handler
-  // no stacktraces leaked to user
-  app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: "",
-      error: {}
-    });
-  });
-
-
-
+// export the module
 module.exports = app;

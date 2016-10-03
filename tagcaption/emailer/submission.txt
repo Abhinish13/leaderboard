@@ -1,0 +1,8 @@
+Dear $toName,
+
+$message
+
+If you have any questions or need help, please contact us at $fromAddress.
+
+Thanks for participating!
+$fromName

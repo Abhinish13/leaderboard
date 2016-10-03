@@ -1,0 +1,94 @@
+extends layout.pug
+
+block content
+	header(class='post-header')
+		h2(class='post-title') #{title}
+	div(class='post-description')
+		p.
+			#{description}
+		p.
+			Runs highlighted in this <span style='background-color:#ffa500'>color</span> are currently being processed by the backend, while runs highlighted in this <span style='background-color:#ff9999'>color</span> could not be processed. Please refresh the leaderboard from time to time for updates.
+	
+	div(class='post-description')
+		table(class='pure-table pure-table-horizontal pure-table-striped')
+			thead
+				tr
+					th(colspan="6", align="center") <span style='background-color:#ffff00'>Photo</span>
+				tr
+					th Verified
+					th Team
+					th Timestamp
+					th #{score1}
+					th Comment
+			tbody
+				each run in photovalid
+					tr
+						td(class='verified')
+							if run.verified == 1
+								img(src='images/check.png' width='14' height='14')
+						td(class='team') #{run.name}
+						td(class='timestamp') #{run.timestamp}
+						td(class='score') #{Number(run.score1).toFixed(2)}
+						td(class='comment') #{run.comment}
+				each run in photoactive
+					tr(class='active')
+						td(class='verified')
+							if run.verified == 1
+								img(src='images/check.png' width='14' height='14')
+						td(class='team') #{run.name}
+						td(class='timestamp') #{run.timestamp}
+						td(class='score')
+						td(class='comment') #{run.comment}
+				each run in photoinvalid
+					tr(class='invalid')
+						td(class='verified')
+							if run.verified == 1
+								img(src='images/check.png' width='14' height='14')
+						td(class='team') #{run.name}
+						td(class='timestamp') #{run.timestamp}
+						td(class='score')
+						td(class='comment') #{run.comment}
+	
+	div(class='post-description')
+		p.
+			&nbsp;
+	
+	div(class='post-description')
+		table(class='pure-table pure-table-horizontal pure-table-striped')
+			thead
+				tr
+					th(colspan="6", align="center") <span style='background-color:#ffff00'>Video</span>
+				tr
+					th Verified
+					th Team
+					th Timestamp
+					th #{score1}
+					th Comment
+			tbody
+				each run in videovalid
+					tr
+						td(class='verified')
+							if run.verified == 1
+								img(src='images/check.png' width='14' height='14')
+						td(class='team') #{run.name}
+						td(class='timestamp') #{run.timestamp}
+						td(class='score') #{Number(run.score1).toFixed(2)}
+						td(class='comment') #{run.comment}
+				each run in videoactive
+					tr(class='active')
+						td(class='verified')
+							if run.verified == 1
+								img(src='images/check.png' width='14' height='14')
+						td(class='team') #{run.name}
+						td(class='timestamp') #{run.timestamp}
+						td(class='score')
+						td(class='comment') #{run.comment}
+				each run in videoinvalid
+					tr(class='invalid')
+						td(class='verified')
+							if run.verified == 1
+								img(src='images/check.png' width='14' height='14')
+						td(class='team') #{run.name}
+						td(class='timestamp') #{run.timestamp}
+						td(class='score')
+						td(class='comment') #{run.comment}
