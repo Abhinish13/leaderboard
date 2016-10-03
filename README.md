@@ -6,11 +6,11 @@ Two directories are included in the repository that contain examples of competit
 
 ## Prerequisites ##
 
-Install Node.JS and NPM:
+*Install Node.JS and NPM*
 + For OS X this can be simply done using Homebrew by running `brew install node`.
 + For RHEL6 machines this can be done by running `curl -sL https://rpm.nodesource.com/setup_6.x | sudo -E bash -`.
 
-Install Dependencies:
+*Install Dependencies*
 + Run `npm install` in the directory where the archive was unpacked to install the dependencies the leaderboard needs in order to run.
 
 ## Instructions ##
